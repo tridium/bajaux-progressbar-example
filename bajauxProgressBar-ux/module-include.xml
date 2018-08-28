@@ -1,0 +1,6 @@
+<!-- Module Include File -->
+<!-- Types -->
+<types>
+  <!--com.tridiumemea.bajauxprogressbar-->
+  <type class="com.tridiumemea.bajauxprogressbar.BProgressBarGauge" name="ProgressBarGauge"/>
+</types>

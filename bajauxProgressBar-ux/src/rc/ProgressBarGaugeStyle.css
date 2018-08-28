@@ -1,0 +1,14 @@
+/*
+ * @copyright 2018 Tridium, Inc. All Rights Reserved.
+ * @author Gareth Johnson
+ */
+
+.progress-bar-gauge-outer {
+  background-color: white;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.progress-bar-gauge {
+  height: 100%;
+}

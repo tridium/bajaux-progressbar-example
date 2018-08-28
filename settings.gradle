@@ -1,0 +1,45 @@
+import groovy.io.FileVisitResult
+import groovy.io.FileType
+def discoveredProjects = [:] as Map
+
+ext {
+  // Configure your sub-project folders here
+  // This will include ALL sub-folders as sub-projects.
+  niagaraRoots = ['.']
+  // To explicitly define sub-project folders, name them in the array like this
+  // niagaraRoots = ['componentLinks', 'envCtrlDriver']
+  
+  // Configure any directories to exclude from search for nested sub-projects
+  excludeDirs = ['.hg', 'build', 'out', 'src', 'srcTest']
+}
+
+// niagaraRoots configuration - do not modify
+niagaraRoots.collect({ file(it) }).findAll({ it.exists() }).each { File projectRoot ->
+  projectRoot.traverse(
+    type: FileType.DIRECTORIES,
+    preRoot: true,
+    preDir: { File projectDir ->
+      def projectName = projectDir.name
+      if (excludeDirs.contains(projectName)) {
+        return FileVisitResult.SKIP_SUBTREE
+      }
+      File buildScript = new File(projectDir, "${projectName}.gradle")
+      if (buildScript.exists()) {
+        discoveredProjects[projectName] = projectDir
+        if (projectDir != projectRoot)
+        {
+          include projectName
+          return FileVisitResult.SKIP_SUBTREE
+        }
+      }
+    }
+  )
+}
+
+rootProject.name = 'bajauxProgressBar'
+rootProject.children.each { project ->
+  project.projectDir = discoveredProjects[project.name]
+  project.buildFileName = "${project.name}.gradle"
+  assert project.projectDir.isDirectory()
+  assert project.buildFile.isFile()
+}

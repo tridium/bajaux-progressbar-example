@@ -1,0 +1,24 @@
+{
+  "name": "bajauxProgressBar",
+  "version": "0.0.1",
+  "description": "Niagara Widget Extensions",
+  "homepage": "https://www.tridium.com",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-niagara": "^0.1.20"
+  },
+  "bugs": {
+    "email": "gjohnson@tridium.com",
+    "url": "https://niagara-central.com/ord?portal:/discussion/DiscussionGroup/557"
+  },
+  "author": {
+    "name": "Gareth Johnson",
+    "email": "gjohnson@tridium.com"
+  },
+  "licenses": [
+    {
+      "type": "Niagara",
+      "url": "https://www.niagara-central.com"
+    }
+  ]
+}

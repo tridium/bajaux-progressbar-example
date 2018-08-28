@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bajaObjectGraph version="1.0">
+<p m="b=baja" t="b:UnrestrictedFolder">
+  <!-- /LineGauge -->
+  <p n="LineGauge" m="wb=workbench" t="wb:WebWidget">
+    <p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,300.0,50.0"/>
+    <p n="js" t="b:Ord" v="view:bajauxProgressBar:ProgressBarGauge"/>
+    <!-- /LineGauge/wbViewBinding -->
+    <p n="wbViewBinding" t="wb:WbViewBinding">
+    </p>
+    <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
+    <p n="gaugeType" f="rh3" t="b:String" v="Line"/>
+  </p>
+  <!-- /CircleGauge -->
+  <p n="CircleGauge" m="wb=workbench" t="wb:WebWidget">
+    <p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,300.0,300.0"/>
+    <p n="js" t="b:Ord" v="view:bajauxProgressBar:ProgressBarGauge"/>
+    <!-- /CircleGauge/wbViewBinding -->
+    <p n="wbViewBinding" t="wb:WbViewBinding">
+    </p>
+    <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
+    <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+  </p>
+  <!-- /SemiCircleGauge -->
+  <p n="SemiCircleGauge" m="wb=workbench" t="wb:WebWidget">
+    <p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,300.0,200.0"/>
+    <p n="js" t="b:Ord" v="view:bajauxProgressBar:ProgressBarGauge"/>
+    <!-- /SemiCircleGauge/wbViewBinding -->
+    <p n="wbViewBinding" t="wb:WbViewBinding">
+    </p>
+    <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
+    <p n="gaugeType" f="rh3" t="b:String" v="SemiCircle"/>
+  </p>
+
+  <p n="DashboardExamples" t="b:UnrestrictedFolder">
+    <!-- Small Circular Gauge -->
+    <p n="SmallCircularGaugeDashboard" m="db=dashboard" t="db:DashboardPane">
+      <p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,120.0,150.0"/>
+      <p n="content" t="wb:WebWidget">
+        <!--p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,110.0,110.0"/-->
+        <p n="js" t="b:Ord" v="view:bajauxProgressBar:ProgressBarGauge"/>
+        <p n="wbViewBinding" t="wb:WbViewBinding"/>
+        <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
+        <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+      </p>
+    </p>
+
+    <!-- Medium Circular Gauge -->
+    <p n="MediumCircularGaugeDashboard" m="db=dashboard" t="db:DashboardPane">
+      <p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,170.0,200.0"/>
+      <p n="content" t="wb:WebWidget">
+        <!--p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,160.0,160.0"/-->
+        <p n="js" t="b:Ord" v="view:bajauxProgressBar:ProgressBarGauge"/>
+        <p n="wbViewBinding" t="wb:WbViewBinding"/>
+        <p n="lineWidth" t="b:Double" v="3.5"/>
+        <p n="font" m="gx=gx" t="gx:Font" v="24.0pt SansSerif"/>
+        <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
+        <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+      </p>
+    </p>
+
+    <!-- Large Circular Gauge -->
+    <p n="LargeCircularGaugeDashboard" m="db=dashboard" t="db:DashboardPane">
+      <p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,250.0,280.0"/>
+      <p n="content" t="wb:WebWidget">
+        <!--p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,240.0,240.0"/-->
+        <p n="js" t="b:Ord" v="view:bajauxProgressBar:ProgressBarGauge"/>
+        <p n="wbViewBinding" t="wb:WbViewBinding"/>
+        <p n="lineWidth" t="b:Double" v="6.0"/>
+        <p n="font" m="gx=gx" t="gx:Font" v="bold 36.0pt SansSerif"/>
+        <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
+        <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+      </p>
+    </p>
+  </p>
+
+</p>
+</bajaObjectGraph>

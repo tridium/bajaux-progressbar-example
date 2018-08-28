@@ -1,0 +1,9 @@
+node_modules
+*~
+*.iml
+.gradle/
+.hg/
+.hgignore
+.idea/
+build/
+bajauxProgressBar-ux/build/
