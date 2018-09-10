@@ -4,47 +4,54 @@
  */
 
 /**
+ * @private
  * @module nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget
  */
 define([
-  'bajaux/Widget',
-  'bajaux/events',
-  'bajaux/mixin/subscriberMixIn',
-  'bajaux/dragdrop/dragDropUtils',
-  'jquery',
-  'baja!',
-  'Promise',
-  'nmodule/js/rc/switchboard/switchboard',
-  'baja!baja:StatusValue,baja:IEnum,control:ControlPoint',
-  'nmodule/bajauxProgressBar/rc/livepoint/model'], function(
-  Widget,
-  events,
-  subscriberMixIn,
-  dragDropUtils,
-  $,
-  baja,
-  Promise,
-  switchboard,
-  types,
-  model){
-  "use strict";
+    'bajaux/Widget',
+    'bajaux/mixin/subscriberMixIn',
+    'bajaux/dragdrop/dragDropUtils',
+    'jquery',
+    'baja!',
+    'Promise',
+    'log!nmodule.bajauxProgressBar.rc.livepoint.LivePointWidget',
+    'nmodule/js/rc/switchboard/switchboard',
+    'baja!baja:StatusValue,baja:IEnum,control:ControlPoint',
+    'nmodule/bajauxProgressBar/rc/livepoint/model'
+  ], function (
+    Widget,
+    subscriberMixIn,
+    dragDropUtils,
+    $,
+    baja,
+    Promise,
+    log,
+    switchboard,
+    types,
+    model
+  ) {
 
-  var overrideOrdName = "overrideOrd";
+  'use strict';
+
+  var overrideOrdName = 'overrideOrd',
+    logSevere = log.severe.bind(log);
 
   /**
    * The base class for all live point widgets.
    *
+   * @private
    * @class
+   * @extends module:bajaux/Widget
    * @alias module:nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget
    */
-  var LivePointWidget = function() {
+  var LivePointWidget = function () {
     var that = this;
     Widget.apply(that, arguments);
 
     that.properties()
       .add({
         name: overrideOrdName,
-        value: "",
+        value: '',
         hidden: true,
         readonly: true,
         dashboard: true
@@ -60,141 +67,178 @@ define([
   LivePointWidget.prototype = Object.create(Widget.prototype);
   LivePointWidget.prototype.constructor = LivePointWidget;
 
-////////////////////////////////////////////////////////////////
-// Render
-////////////////////////////////////////////////////////////////
-
-  LivePointWidget.prototype.doRender = function (data) {};
 
   /**
-   * Render the gauge. This will resolve the data asynchronously
-   * and then render the data in the gauge. Note that any request to render while rendering is in progress
-   * will wait for the current rendering to complete before starting a new rendering request
+   * Returns a point data model that will be used by #doRender() to convert this
+   * widget's value() into a data object that will then be used to render the widget.
    *
-   * @private
-   * @inner
+   * If overriding this function, the returned model is expected to contains a
+   * resolveData({}) function.
+   *
+   * @returns {Promise.<Object>} promise to be resolved
+   * with a point data model.
+   */
+  LivePointWidget.prototype.makeModel = function () {
+    return Promise.resolve(model);
+  };
+
+
+  /**
+   * Called when rendering the Widget. This method is designed
+   * to be overridden.
+   *
+   * @param {Object} data - key/value pairs of data used to render the widget.
+   * @returns {*|Promise} This method may optionally return a promise once the
+   * Widget has been rendered.
+   */
+  LivePointWidget.prototype.doRender = function (data) {
+  };
+
+  /**
+   * Render the gauge. This will resolve the data asynchronously and then render the data
+   * in the gauge. Note that any request to render while rendering is in progress will
+   * wait for the current rendering to complete before starting a new rendering request.
+   *
+   * This method should not typically be overridden. Override
+   * {@link module:bajauxProgressBar/rc/livepoint/LivePointWidget#doRender|doRender()} instead.
    *
    * @returns {Promise}
    */
-  LivePointWidget.prototype.render = function(){
+  LivePointWidget.prototype.render = function () {
     var that = this;
-    return model.resolveData(that)
-      .then(function(data) {
+
+    //return model.resolveData(that)
+    return that.makeModel()
+      .then(function (model) {
+        return model.resolveData(that);
+      })
+      .then(function (data) {
 
         var jq = that.jq();
         data.width = jq.width();
         data.height = jq.height();
 
-        return that.doRender(data) || Promise.resolve();
+        return that.doRender(data);
       });
   };
-
-////////////////////////////////////////////////////////////////
-// Override ORD
-////////////////////////////////////////////////////////////////
 
   /**
    * Resolves any override ORD and then renders the widget.
    *
-   * @inner
-   * @private
-   *
-   * @param widget The widget instance.
-   * @return {Promise|*}
+   * @return {Promise}
    */
-  function resolveOverrideOrd(widget) {
-    var ord = widget.properties().getValue(overrideOrdName);
+  LivePointWidget.prototype.$resolveOverrideOrd = function () {
+    var that = this,
+      ord = that.properties().getValue(overrideOrdName);
 
     if (ord) {
-      return widget.resolve(ord)
-        .then(function(value) {
+      return that.resolve(ord)
+        .then(function (value) {
           // reset gauge statistics on ord modification
-          widget.$lastMin = undefined;
-          widget.$lastMax = undefined;
-          widget.$overrideVal = value;
-          return widget.render();
+          that.$lastMin = undefined;
+          that.$lastMax = undefined;
+          that.$overrideVal = value;
+          return that.render();
         });
+    } else {
+      delete that.$overrideVal;
+      return Promise.resolve();
     }
-    else {
-      delete widget.$overrideVal;
-    }
-  }
+  };
 
   /**
    * Called when a new data value is dragged and dropped onto the widget.
    *
-   * @inner
-   * @private
-   *
-   * @param  widget The widget instance to update with the new value.
-   * @param  dataTransfer The data
+   * @param  {DataTransfer} dataTransfer The data
    * @return {Promise} A promise that's resolved once the drag and drop operation
    * has completed.
    */
-  function updateFromDrop(widget, dataTransfer) {
+  LivePointWidget.prototype.$updateFromDrop = function (dataTransfer) {
+    var that = this;
     return dragDropUtils.fromClipboard(dataTransfer)
       .then(function (envelope) {
         switch (envelope.getMimeType()) {
           case 'niagara/navnodes':
-            envelope.toJson()
+            return envelope.toJson()
               .then(function (json) {
                 var obj = json && json[0],
-                    oldOverrideOrd;
+                  oldOverrideOrd;
 
                 if (obj && obj.ord) {
                   // Record any ORD value so we can unsubscribe it.
-                  oldOverrideOrd = widget.properties().getValue(overrideOrdName);
+                  oldOverrideOrd = that.properties().getValue(overrideOrdName);
 
-                  widget.properties().setValue(overrideOrdName, obj.ord);
+                  that.properties().setValue(overrideOrdName, obj.ord);
 
                   if (oldOverrideOrd) {
                     return baja.Ord.make(oldOverrideOrd).resolve()
                       .then(function (target) {
                         var comp = target.getComponent();
                         if (comp) {
-                          return widget.getSubscriber().unsubscribe(comp);
+                          return that.getSubscriber().unsubscribe(comp);
                         }
                       });
                   }
                 }
               })
               .then(function () {
-                return resolveOverrideOrd(widget);
+                return that.$resolveOverrideOrd();
               });
         }
       });
-  }
+  };
 
-////////////////////////////////////////////////////////////////
-// Widget
-////////////////////////////////////////////////////////////////
-
-  LivePointWidget.prototype.doInitialize = function(element) {
+  /**
+   * Initializes the Live Point Widget.
+   *
+   * @param {jQuery} element The element in which this Widget should build its
+   * HTML.
+   * @returns {Promise} Promise to be resolved once the Widget has initialized.
+   */
+  LivePointWidget.prototype.doInitialize = function (element) {
     var that = this;
 
     that.jq()
-      .on("dragover", function(e) {
+      .on('dragover', function (e) {
         e.preventDefault();
       })
-      .on("drop", function(e) {
-        updateFromDrop(that, e.originalEvent.dataTransfer).catch(baja.error);
+      .on('drop', function (e) {
+        //updateFromDrop(that, e.originalEvent.dataTransfer).catch(logSevere);
         e.preventDefault();
         e.stopPropagation();
+        return that.$updateFromDrop(e.originalEvent.dataTransfer);
       });
 
-    that.getSubscriber().attach("changed", function() {
-      that.render().catch(baja.error);
+    that.getSubscriber().attach('changed', function () {
+      that.render().catch(logSevere);
     });
 
-    return resolveOverrideOrd(that);
+    return that.$resolveOverrideOrd();
   };
 
+  /**
+   * Called when the layout of the Widget changes.
+   *
+   * @returns {*|Promise} This method may optionally return a promise once the
+   * Widget has been laid out.
+   */
   LivePointWidget.prototype.doLayout =
-    LivePointWidget.prototype.doChanged = function() {
+    /**
+     * Called by {@link module:bajaux/Widget#changed|changed()} when a Property
+     * is changed.
+     */
+    LivePointWidget.prototype.doChanged = function () {
       return this.render();
     };
 
-  LivePointWidget.prototype.doLoad = function() {
+  /**
+   * Performs the actual work of populating the widget's HTML to reflect the
+   * input value.
+   *
+   * @returns {Promise} An optional promise that's resolved once the widget has
+   * loaded.
+   */
+  LivePointWidget.prototype.doLoad = function () {
     return this.render();
   };
 

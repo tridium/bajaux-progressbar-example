@@ -14,6 +14,8 @@ dependencies {
   compile "Tridium:web-rt:4.6"
   compile 'Tridium:bajaux-ux:4.6'
   compile 'Tridium:js-ux:4.6'
+  compile 'Tridium:bajaScript-ux:4.6'
+  compile 'Tridium:gx-rt:4.6'
 }
 
 jar {
@@ -26,12 +28,23 @@ jar {
   }
 }
 
+moduleTestJar {
+  from('srcTest') {
+    include 'rc/**/*.xml'
+    include 'rc/**/*.js'
+    include 'rc/**/*.css'
+    include 'rc/**/*.bog'
+  }
+}
+
 niagaraRjs {
   builds = [
     'bajauxProgressBar': [
       rootDir: 'src/rc',
       include: [
-        'nmodule/bajauxProgressBar/rc/bajauxProgressBar.run'
+        'nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
+        'nmodule/bajauxProgressBar/rc/livepoint/model',
+        'nmodule/bajauxProgressBar/rc/ProgressBarGauge'
       ]
     ],
   ]
@@ -40,7 +53,7 @@ niagaraRjs {
     //BajaScript and lexicons cannot legitimately start without running a
     //station, so disable these plugins outright. Note that this not a standard
     //r.js option - it's only used by the niagara-rjs plugin.
-    disablePlugins: [ 'baja', 'lex', 'css', 'jsx' ],
+    disablePlugins: [ 'baja', 'lex', 'css', 'jsx', 'log' ],
 
     //If you're sharing this code with other modules that use Handlebars,
     //it's likely these libraries will already be in the browser cache, so
@@ -72,7 +85,6 @@ niagaraRjs {
       'bajaux': 'empty:',
       'bajaScript': 'empty:',
       'Promise': 'empty:',
-      'd3': 'empty:',
 
       //make Handlebars and associated libraries available to run during the
       //build process, as templates will be precompiled.

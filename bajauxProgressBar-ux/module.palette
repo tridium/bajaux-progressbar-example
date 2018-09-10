@@ -9,7 +9,7 @@
     <p n="wbViewBinding" t="wb:WbViewBinding">
     </p>
     <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
-    <p n="gaugeType" f="rh3" t="b:String" v="Line"/>
+    <p n="gaugeType" f="rh3" m="bpb=bajauxProgressBar" t="bpb:ProgressBarType" v="Line"/>
   </p>
   <!-- /CircleGauge -->
   <p n="CircleGauge" m="wb=workbench" t="wb:WebWidget">
@@ -19,7 +19,7 @@
     <p n="wbViewBinding" t="wb:WbViewBinding">
     </p>
     <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
-    <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+    <p n="gaugeType" f="rh3" t="bpb:ProgressBarType" v="Circle"/>
   </p>
   <!-- /SemiCircleGauge -->
   <p n="SemiCircleGauge" m="wb=workbench" t="wb:WebWidget">
@@ -29,7 +29,7 @@
     <p n="wbViewBinding" t="wb:WbViewBinding">
     </p>
     <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
-    <p n="gaugeType" f="rh3" t="b:String" v="SemiCircle"/>
+    <p n="gaugeType" f="rh3" t="bpb:ProgressBarType" v="SemiCircle"/>
   </p>
 
   <p n="DashboardExamples" t="b:UnrestrictedFolder">
@@ -41,7 +41,7 @@
         <p n="js" t="b:Ord" v="view:bajauxProgressBar:ProgressBarGauge"/>
         <p n="wbViewBinding" t="wb:WbViewBinding"/>
         <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
-        <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+        <p n="gaugeType" f="rh3" t="bpb:ProgressBarType" v="Circle"/>
       </p>
     </p>
 
@@ -55,7 +55,7 @@
         <p n="lineWidth" t="b:Double" v="3.5"/>
         <p n="font" m="gx=gx" t="gx:Font" v="24.0pt SansSerif"/>
         <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
-        <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+        <p n="gaugeType" f="rh3" t="bpb:ProgressBarType" v="Circle"/>
       </p>
     </p>
 
@@ -69,7 +69,7 @@
         <p n="lineWidth" t="b:Double" v="6.0"/>
         <p n="font" m="gx=gx" t="gx:Font" v="bold 36.0pt SansSerif"/>
         <p n="formFactor" f="rh3" m="w=web" t="w:FormFactorEnum" v="compact"/>
-        <p n="gaugeType" f="rh3" t="b:String" v="Circle"/>
+        <p n="gaugeType" f="rh3" t="bpb:ProgressBarType" v="Circle"/>
       </p>
     </p>
   </p>

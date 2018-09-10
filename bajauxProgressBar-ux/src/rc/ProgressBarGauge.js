@@ -6,29 +6,32 @@
  * @module nmodule/bajauxProgressBar/rc/ProgressBarGauge
  * @private
  */
-define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
-        'nmodule/bajauxProgressBar/rc/progressbar/progressbar.min',
-        'baja!',
-        'baja!gx:Font',
-        'd3',
-        'jquery',
-        'Promise',
-        'nmodule/webChart/rc/model/modelUtil',
-        'css!nmodule/bajauxProgressBar/rc/ProgressBarGaugeStyle'], function(
-        LivePointWidget,
-        ProgressBar,
-        baja,
-        types,
-        d3,
-        $,
-        Promise,
-        modelUtil) {
+define([
+    'nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
+    'nmodule/bajauxProgressBar/rc/progressbar/progressbar.min',
+    'baja!',
+    'baja!gx:Font,bajauxProgressBar:ProgressBarType',
+    'jquery',
+    'Promise',
+    'lex!bajauxProgressBar',
+    'css!nmodule/bajauxProgressBar/rc/bajauxProgressBar'
+  ], function (
+    LivePointWidget,
+    ProgressBar,
+    baja,
+    types,
+    $,
+    Promise,
+    lexs
+  ) {
 
   'use strict';
 
   var DEFAULT_FONT = baja.$('gx:Font'), // => '12.0pt sans-serif'
     DEFAULT_FONT_VALUE = 'null',
-    DEFAULT_FONT_SIZE = 12;
+    DEFAULT_FONT_SIZE = 12,
+    PROGRESS_BAR_TYPE = baja.$('bajauxProgressBar:ProgressBarType'), // defaults to 'Line'
+    lex = lexs[0];
 
   /**
    * A gauge that uses the progress bar JavaScript library.
@@ -38,10 +41,10 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
    *
    * @private
    * @class
-   * @alias module:nmodule/webChart/rc/gauge/ProgressBarGauge
-   * @extends module:nmodule:/webChart/rc/livepoint/LivePointWidget
+   * @alias module:nmodule/bajauxProgressBar/rc/ProgressBarGauge
+   * @extends module:nmodule:/bajauxProgressBar/rc/livepoint/LivePointWidget
    */
-  var ProgressBarGauge = function() {
+  var ProgressBarGauge = function () {
     LivePointWidget.apply(this, arguments);
 
     this.properties()
@@ -50,8 +53,8 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
       .add('max', -1)
       .add({
         name: 'gaugeType',
-        value: 'Line',
-        readonly: true
+        value: PROGRESS_BAR_TYPE.getTag(),
+        typeSpec: 'bajauxProgressBar:ProgressBarType'
       })
       .add({
         name: 'fill',
@@ -64,12 +67,12 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
         typeSpec: 'gx:Color'
       })
       .add({
-        name: 'barColor', 
+        name: 'barColor',
         value: '#00C0FF',
         typeSpec: 'gx:Color'
       })
       .add({
-        name: 'trailColor', 
+        name: 'trailColor',
         value: '#f4f4f4',
         typeSpec: 'gx:Color'
       })
@@ -85,9 +88,9 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
       })
       .add({
         name: 'showText',
-        value: 'true',
+        value: true,
         typeSpec: 'baja:Boolean',
-        properties: { trueText: 'showText', falseText: 'hideText' }
+        properties: { trueText: lex.get('showText'), falseText: lex.get('hideText') }
       })
       .add({
         name: 'lineWidth',
@@ -99,13 +102,21 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
   ProgressBarGauge.prototype = Object.create(LivePointWidget.prototype);
   ProgressBarGauge.prototype.constructor = ProgressBarGauge;
 
+  /**
+   * Parses the given string into its constituent font settings
+   *
+   * @param {String} fontString
+   * @returns {Object} an object containing the font settings
+   */
   function parseFont(fontString) {
 
-    if (!fontString || fontString === DEFAULT_FONT_VALUE) { fontString = DEFAULT_FONT.encodeToString(); }
+    if (!fontString || fontString === DEFAULT_FONT_VALUE) {
+      fontString = DEFAULT_FONT.encodeToString();
+    }
 
-    var fontWeight = fontString.indexOf('bold') >= 0 ? 'bold' : 'normal' ;
-    var fontStyle = fontString.indexOf('italic') >= 0 ? 'italic' : 'normal' ;
-    var textDecoration = fontString.indexOf('underline') >= 0 ? 'underline' : 'none' ;
+    var fontWeight = fontString.indexOf('bold') >= 0 ? 'bold' : 'normal';
+    var fontStyle = fontString.indexOf('italic') >= 0 ? 'italic' : 'normal';
+    var textDecoration = fontString.indexOf('underline') >= 0 ? 'underline' : 'none';
 
     // remove instances of bold, italic & underline from the string
     fontString = fontString.replace(/bold/g, '');
@@ -115,14 +126,20 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
 
     // This leaves pt size and fontName, so we can separate them around the pt (the first one!)
     var splitPoint = fontString.indexOf('pt'),
-      fontSize = fontString.substring(0, splitPoint+2),
-      fontFamily = fontString.substring(splitPoint+3); // 3 because we're expecting a space after xx.xpt
+      fontSize = '',
+      fontFamily = '';
 
+    if (splitPoint >= 0) {
+      fontSize = fontString.substring(0, splitPoint + 2);
+      fontFamily = fontString.substring(splitPoint + 3); // 3 because we're expecting a space after xx.xpt
+    }
     // change pt to px
     fontSize = fontSize.replace(/pt/g, 'px');
 
     // fix for sans Serif
-    if (fontFamily.toLowerCase() === 'sansserif') { fontFamily = 'sans-serif'; }
+    if (fontFamily.toLowerCase() === 'sansserif') {
+      fontFamily = 'sans-serif';
+    }
 
     return {
       'font-family': fontFamily,
@@ -134,16 +151,19 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
   }
 
 
+  /**
+   * @returns {Object} settings to animate the Progress Bar
+   */
   ProgressBarGauge.prototype.makeAnimationObject = function () {
     var containerWidth, fontSize, midway,
       isCircleGauge = this.properties().getValue('gaugeType') === 'Circle',
       css = parseFont(this.properties().getValue('font'));
 
-    if(css) { this.jq().css(css); }
+    this.jq().css(css);
 
     if (isCircleGauge) {
       containerWidth = this.jq().width();
-      fontSize = (css && css['font-size']) ? css['font-size'].replace(/px/g, '') : DEFAULT_FONT_SIZE;
+      fontSize = (css['font-size']) ? css['font-size'].replace(/px/g, '') : DEFAULT_FONT_SIZE;
       midway = (Number(fontSize) + containerWidth) / 2; // An adjustment to make the text sit in the middle of the circle
     }
 
@@ -181,35 +201,55 @@ define(['nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
     };
   };
 
+  /**
+   * Render the Progress Bar widget.
+   *
+   * @param {Object} data - key/value pairs of data used to render the widget.
+   */
   ProgressBarGauge.prototype.doRender = function (data) {
     var min = data.min || 0,
-        max = data.max || 100,
-        value = (data.value - min) / max,
-        showText = this.properties().getValue('showText');
+      max = data.max || 100,
+      value = (data.value - min) / max,
+      showText = this.properties().getValue('showText');
 
     this.$bar.animate(value, this.makeAnimationObject());
     this.$bar.setText(showText ? data.valueText : '');
 
     var background = this.properties().getValue('background');
     if (background) {
-      this.jq('.progress-bar-gauge').css({backgroundColor: background});
+      this.jq('.progress-bar-gauge').css({ backgroundColor: background });
     }
   };
 
+  /**
+   * Initialize the Progress Bar Widget.
+   *
+   * @param {jQuery} element The element in which this Widget should build its HTML.
+   * @returns {Promise}
+   */
   ProgressBarGauge.prototype.doInitialize = function (element) {
     element.addClass('progress-bar-gauge-outer');
     element.html('<div class="progress-bar-gauge"></div>');
 
     this.$bar = new ProgressBar[this.properties().getValue('gaugeType')](
-      element.children('.progress-bar-gauge').get(0), 
+      element.children('.progress-bar-gauge').get(0),
       this.makeAnimationObject());
 
     return LivePointWidget.prototype.doInitialize.apply(this, arguments);
   };
 
+  /**
+   * Clean up after the Progress Bar when no longer needed.
+   *
+   * @returns {Promise}
+   */
   ProgressBarGauge.prototype.doDestroy = function () {
-    this.jq().removeClass('progress-bar-gauge-outer');
-    this.$bar.destroy();
+    var that = this;
+    that.jq().removeClass('progress-bar-gauge-outer');
+    return Promise.resolve(that.$bar.destroy())
+    .then(function () {
+      that.$bar = null;
+    });
   };
 
   return ProgressBarGauge;

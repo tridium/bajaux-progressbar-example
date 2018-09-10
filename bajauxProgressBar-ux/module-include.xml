@@ -3,4 +3,5 @@
 <types>
   <!--com.tridiumemea.bajauxprogressbar-->
   <type class="com.tridiumemea.bajauxprogressbar.BProgressBarGauge" name="ProgressBarGauge"/>
+  <type class="com.tridiumemea.bajauxprogressbar.BProgressBarType" name="ProgressBarType"/>
 </types>
