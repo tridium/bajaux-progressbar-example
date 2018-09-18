@@ -26,11 +26,7 @@ module.exports = function runGrunt(grunt) {
     jshint: { src: ALL_FILES },
     plato: { src: SRC_FILES },
     watch: {
-      src: ALL_FILES,
-      karma: {
-        files: TEST_FILES,
-        tasks: [ 'karma' ]
-      }
+      src: ALL_FILES
     },
     karma: {},
     niagara: {

@@ -69,25 +69,19 @@ define([
 
 
   /**
-   * Returns a point data model that will be used by #doRender() to convert this
-   * widget's value() into a data object that will then be used to render the widget.
+   * Returns a point data model that will be used by #render() to render the widget.
    *
-   * If overriding this function, the returned model is expected to contains a
-   * resolveData({}) function.
-   *
-   * @returns {Promise.<Object>} promise to be resolved
-   * with a point data model.
+   * @returns {Promise.<Object>} promise to be resolved with a point data model.
    */
-  LivePointWidget.prototype.makeModel = function () {
-    return Promise.resolve(model);
+  LivePointWidget.prototype.resolveData = function () {
+    return model.resolveData(this);
   };
 
 
   /**
-   * Called when rendering the Widget. This method is designed
-   * to be overridden.
+   * Called when rendering the Widget. This method is designed to be overridden.
    *
-   * @param {Object} data - key/value pairs of data used to render the widget.
+   * @param {Object} data - a point data model used to render the widget.
    * @returns {*|Promise} This method may optionally return a promise once the
    * Widget has been rendered.
    */
@@ -96,7 +90,7 @@ define([
 
   /**
    * Render the gauge. This will resolve the data asynchronously and then render the data
-   * in the gauge. Note that any request to render while rendering is in progress will
+   * in the widget. Note that any request to render while rendering is in progress will
    * wait for the current rendering to complete before starting a new rendering request.
    *
    * This method should not typically be overridden. Override
@@ -107,11 +101,7 @@ define([
   LivePointWidget.prototype.render = function () {
     var that = this;
 
-    //return model.resolveData(that)
-    return that.makeModel()
-      .then(function (model) {
-        return model.resolveData(that);
-      })
+    return that.resolveData()
       .then(function (data) {
 
         var jq = that.jq();
@@ -191,7 +181,7 @@ define([
   /**
    * Initializes the Live Point Widget.
    *
-   * @param {jQuery} element The element in which this Widget should build its
+   * @param {JQuery} element The element in which this Widget should build its
    * HTML.
    * @returns {Promise} Promise to be resolved once the Widget has initialized.
    */

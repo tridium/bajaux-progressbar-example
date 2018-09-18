@@ -2,5 +2,5 @@
 # Lexicon for the Bajaux Progress Bar Example module.
 #
 
-showText=showText
-hideText=showText
+showText=Show Text
+hideText=Hide Text

@@ -28,12 +28,10 @@
       nmodule: '/module',
       'nmodule/bajauxProgressBar': 'src',
       'nmodule/bajauxProgressBarTest': 'srcTest',
-      Promise: '/module/js/rc/bluebird/bluebird',
+      Promise: '/module/js/rc/bluebird/bluebird.min',
       'niagara-test-server': '/niagara-test-server',
       underscore: '/module/js/rc/underscore/underscore',
       dialogs: '/module/js/rc/dialogs/dialogs',
-      //specUtils: '/module/webEditorsTest/rc/spec/specUtils'
-      //specUtils: '/module/microsTest/rc/specUtils/specUtils',
       log: '/module/js/rc/log/logPlugin'
     }
   });

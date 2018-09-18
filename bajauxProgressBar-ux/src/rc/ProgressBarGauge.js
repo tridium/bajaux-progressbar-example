@@ -224,7 +224,7 @@ define([
   /**
    * Initialize the Progress Bar Widget.
    *
-   * @param {jQuery} element The element in which this Widget should build its HTML.
+   * @param {JQuery} element The element in which this Widget should build its HTML.
    * @returns {Promise}
    */
   ProgressBarGauge.prototype.doInitialize = function (element) {

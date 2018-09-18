@@ -65,7 +65,7 @@ define([
       STALE_COLOR = '#a59d86',
       OVERRIDDEN_COLOR = '#bfaddc';
 
-    var rootComponent, vanillaComponent, componentWithOutSlot, componentWithBoolean, booleanSlot, enumSlot,
+    var rootComponent, vanillaComponent, componentWithOutSlot, componentWithBoolean, booleanValue, enumValue,
       slotOnControlPoint, numericPoint;
 
 
@@ -81,17 +81,17 @@ define([
         }),
         outSlotWithBoolean: baja.$('baja:Component', {
           out: baja.$('baja:StatusBoolean', {
-            value: Boolean.make(true),
+            value: true,
             status: baja.Status.ok
           })
         }),
         controlPoint: baja.$('control:BooleanPoint', {
           out: baja.$('baja:StatusBoolean', {
-            value: Boolean.make(false),
+            value: false,
             status: baja.Status.ok
           })
         }),
-        bool: baja.$('baja:Boolean').make(Boolean.make(true)),
+        bool: true,
         enum: baja.$('baja:Weekday'),
         numeric: baja.$('control:NumericPoint', {
           out: 3.14
@@ -103,9 +103,9 @@ define([
       componentWithBoolean = rootComponent.get('outSlotWithBoolean');
       slotOnControlPoint = rootComponent.get('controlPoint').get('out');
 
-      booleanSlot = rootComponent.get('bool');
+      booleanValue = rootComponent.get('bool');
 
-      enumSlot = rootComponent.get('enum');
+      enumValue = rootComponent.get('enum');
       numericPoint = rootComponent.get('numeric');
 
 
@@ -238,9 +238,9 @@ define([
           expectedValue;
 
         beforeEach(function () {
-          resolvedValue = booleanSlot;
+          resolvedValue = booleanValue;
           livePointWidget.$value = resolvedValue;
-          expectedValue = booleanSlot.getOrdinal();
+          expectedValue = booleanValue.getOrdinal();
 
           return resolveData(livePointWidget)
             .then(function (data) {
@@ -416,14 +416,14 @@ define([
         var expectedTicks, expectedMax, expectedTags, expectedValue;
 
         beforeEach(function () {
-          resolvedValue = enumSlot;
+          resolvedValue = enumValue;
           livePointWidget.$value = resolvedValue;
 
-          expectedTicks = enumSlot.getRange().getOrdinals().length;
+          expectedTicks = enumValue.getRange().getOrdinals().length;
           expectedMax = expectedTicks - 1;
-          expectedValue = enumSlot.getOrdinal();
-          expectedTags = enumSlot.getRange().getOrdinals().map(function (ordinal) {
-            return enumSlot.getRange().getDisplayTag(ordinal);
+          expectedValue = enumValue.getOrdinal();
+          expectedTags = enumValue.getRange().getOrdinals().map(function (ordinal) {
+            return enumValue.getRange().getDisplayTag(ordinal);
           });
 
           return resolveData(livePointWidget)

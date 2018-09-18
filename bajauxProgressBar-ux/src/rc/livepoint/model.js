@@ -66,14 +66,20 @@ define([
   }
 
   /**
-   * Asynchronously resolve an object that contains all the data necessary for rendering a gauge.
+   * @private
+   * @exports nmodule/bajauxProgressBar/rc/livepoint/model
+   */
+  var exports = {};
+
+  /**
+   * Asynchronously resolve an object that contains all the data necessary for rendering.
    *
    * @param {bajaux/Widget} widget The Widget used to create the data.
    *
-   * @returns {Promise} A promise that resolves to an object that contains all of the
-   * data used to render a gauge.
+   * @returns {Promise.<module:nmodule/bajauxProgressBar/rc/livepoint/model~PointDataModel>}
+   *    A promise that resolves to an object containing the data used to render a widget.
    */
-  var resolveData = function (widget) {
+  exports.resolveData = function (widget) {
 
     var value = typeof widget.$overrideVal !== 'undefined' ? widget.$overrideVal : widget.value(),
       properties = widget.properties(),
@@ -268,32 +274,17 @@ define([
   };
 
   /**
-   * @private
-   * @exports nmodule/bajauxProgressBar/rc/livepoint/model
-   */
-  var exports = {};
-
-  /**
-   * Asynchronously resolve an object that contains all the data necessary for rendering.
-   *
-   * @param {bajaux/Widget} widget The Widget used to create the data.
-   *
-   * @returns {Promise.<module:nmodule/bajauxProgressBar/rc/livepoint/model~PointDataModel>}
-  */
-  exports.resolveData = resolveData;
-
-  /**
    * @typedef {object} module:nmodule/bajauxProgressBar/rc/livepoint/model~PointDataModel
-   * @property {string[]} displayTags a list of display tags, applies to booleans & enums, default is undefined
-   * @property {string} min the lower limit for the value to be displayed, default is 0
+   * @property {string[]} displayTags, a list of display tags, applies to booleans & enums, default is undefined
+   * @property {string} min, the lower limit for the value to be displayed, default is 0
    * @property {string} max, the lower limit for the value to be displayed, default is 100
-   * @property {number} ticks, default is 5
+   * @property {number} ticks, the number of tick marks to be displayed, default is 5
    * @property {string} value, a string representation of the value with baja.Format applied, default is null
    * @property {string} title, a title with baja.Format applied, , default is an empty string
    * @property {string} valueText, the value converted to text, default is an empty string
    * @property {string} color, a string representation of a color, default is undefined
-   * @property {baja.Unit} units, used for the displaying min, max and value
-   * @property {number} precision
+   * @property {baja.Unit} units, used for the displaying min, max and value, default is baja.Unit.DEFAULT
+   * @property {number} precision, default is 2
    */
   return exports;
 });

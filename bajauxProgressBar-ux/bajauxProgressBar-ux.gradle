@@ -53,7 +53,7 @@ niagaraRjs {
     //BajaScript and lexicons cannot legitimately start without running a
     //station, so disable these plugins outright. Note that this not a standard
     //r.js option - it's only used by the niagara-rjs plugin.
-    disablePlugins: [ 'baja', 'lex', 'css', 'jsx', 'log' ],
+    disablePlugins: [ 'baja', 'lex', 'css', 'log' ],
 
     //If you're sharing this code with other modules that use Handlebars,
     //it's likely these libraries will already be in the browser cache, so

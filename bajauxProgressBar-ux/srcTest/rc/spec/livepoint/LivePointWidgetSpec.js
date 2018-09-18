@@ -4,7 +4,7 @@ define([
     'Promise',
     'jquery',
     'nmodule/bajauxProgressBar/rc/livepoint/LivePointWidget',
-    'nmodule/webChart/rc/gauge/model',
+    'nmodule/bajauxProgressBar/rc/livepoint/model',
     'bajaux/dragdrop/dragDropUtils',
     'bajaScript/baja/ord/OrdTarget'
   ], function (
@@ -13,7 +13,7 @@ define([
     Promise,
     $,
     LivePointWidget,
-    WebChartGaugeModel,
+    model,
     dragDropUtils,
     OrdTarget
   ) {
@@ -26,7 +26,7 @@ define([
       OVERRIDE_ORD_VALUE = 'override',
       NEW_OVERRIDE_ORD_VALUE = 'new override',
       spyRender, spyResolve, event, subscriber,
-      dataTransfer, envelope/*, ord*/;
+      dataTransfer, envelope;
 
 
     beforeEach(function () {
@@ -44,12 +44,11 @@ define([
     });
 
     afterEach(function () {
-      if (livePointWidget) { return livePointWidget.destroy(); }
+      return livePointWidget.destroy();
     });
 
     describe('#doInitialize()', function () {
       it('adds a \'changed\' callback to the subscriber', function () {
-        expect(livePointWidget.getSubscriber().attach).toHaveBeenCalled();
         expect(livePointWidget.getSubscriber().attach).toHaveBeenCalledWith('changed', jasmine.any(Function));
       });
 
@@ -82,9 +81,11 @@ define([
       });
 
       describe('drop event', function () {
+        var dataTransferObj = { dt: 'test' };
+
         function makeDropEvent() {
           var e = $.Event('drop');
-          e.originalEvent = { dataTransfer: 'test' };
+          e.originalEvent = { dataTransfer: dataTransferObj };
           e.preventDefault = jasmine.createSpy('preventDefault');
           e.stopPropagation = jasmine.createSpy('stopPropagation');
           return e;
@@ -97,7 +98,7 @@ define([
         });
 
         it('calls $updateFromDrop() on an drop operation', function () {
-          expect(livePointWidget.$updateFromDrop).toHaveBeenCalledWith('test');
+          expect(livePointWidget.$updateFromDrop).toHaveBeenCalledWith(dataTransferObj);
         });
 
         it('calls event `preventDefault()`', function () {
@@ -122,7 +123,7 @@ define([
           livePointWidget.properties().setValue('overrideOrd', OVERRIDE_ORD_VALUE);
         });
 
-        it('populates widget properities', function () {
+        it('populates widget properties', function () {
           return livePointWidget.$resolveOverrideOrd()
             .then(function () {
               expect(livePointWidget.$lastMin).toBeUndefined();
@@ -135,9 +136,9 @@ define([
           var callsSoFar = livePointWidget.render.calls.length;
 
           return livePointWidget.$resolveOverrideOrd()
-          .then(function () {
-            expect(livePointWidget.render.calls.length).toBe(callsSoFar + 1);
-          });
+            .then(function () {
+              expect(livePointWidget.render.calls.length).toBe(callsSoFar + 1);
+            });
         });
       });
 
@@ -218,9 +219,9 @@ define([
           expect(livePointWidget.$overrideVal).toBe(OVERRIDE_ORD_VALUE);
 
           return livePointWidget.$updateFromDrop(dataTransfer)
-          .then(function () {
-            expect(livePointWidget.$overrideVal).toBe(OVERRIDE_ORD_VALUE);
-          });
+            .then(function () {
+              expect(livePointWidget.$overrideVal).toBe(OVERRIDE_ORD_VALUE);
+            });
         });
       });
 
@@ -262,38 +263,48 @@ define([
               expect(subscriber.unsubscribe).toHaveBeenCalledWith(ordTarget.getComponent());
             });
         });
+
+        it('calls $resolveOverrideOrd but not unsubcribe if overrideOrd property is falsy', function () {
+          var callsSoFar = livePointWidget.$resolveOverrideOrd.calls.length;
+          livePointWidget.properties().setValue('overrideOrd', null);
+
+          return livePointWidget.$updateFromDrop(dataTransfer)
+            .then(function () {
+              expect(livePointWidget.$resolveOverrideOrd.calls.length).toBe(callsSoFar + 1);
+              expect(subscriber.unsubscribe).not.toHaveBeenCalled();
+            });
+        });
       });
 
     });
 
+    describe('#resolveData() ', function () {
+      it('calls resolveData on the model', function () {
+        spyOn(model, 'resolveData').andCallThrough();
 
-    describe('#makeModel() ', function () {
-      it('returns a webChart/rc/gauge/model object', function () {
-        return livePointWidget.makeModel()
-          .then(function (model) {
-            expect(model).toEqual(jasmine.any(Object));
-            expect(model.resolveData).toBeTruthy();
-            expect(typeof model.resolveData).toBe('function');
+        return livePointWidget.resolveData()
+          .then(function () {
+            expect(model.resolveData).toHaveBeenCalledWith(livePointWidget);
           });
       });
     });
 
     describe('#doRender() ', function () {
       it('by default does nothing', function () {
-        expect(function () {
-          return livePointWidget.doRender();
-        }).toBeResolved();
+        expect(
+          livePointWidget.doRender()
+        ).toBeResolved();
       });
     });
 
     describe('#render() ', function () {
       it('creates a data model', function () {
-        spyOn(livePointWidget, 'makeModel').andCallThrough();
+        spyOn(livePointWidget, 'resolveData').andCallThrough();
 
         return livePointWidget.render()
-        .then(function () {
-          expect(livePointWidget.makeModel).toHaveBeenCalled();
-        });
+          .then(function () {
+            expect(livePointWidget.resolveData).toHaveBeenCalled();
+          });
       });
 
       it('populates height and width in the data object passed to doRender', function () {
@@ -306,9 +317,9 @@ define([
         });
 
         return livePointWidget.render()
-        .then(function () {
-          expect(livePointWidget.doRender).toHaveBeenCalled();
-        });
+          .then(function () {
+            expect(livePointWidget.doRender).toHaveBeenCalled();
+          });
       });
 
     });
@@ -316,9 +327,9 @@ define([
     describe('#doLoad()', function () {
       it('calls render()', function () {
         return livePointWidget.doLoad()
-        .then(function () {
-          expect(livePointWidget.render).toHaveBeenCalled();
-        });
+          .then(function () {
+            expect(livePointWidget.render).toHaveBeenCalled();
+          });
       });
     });
 
