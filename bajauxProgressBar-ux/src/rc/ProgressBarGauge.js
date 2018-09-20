@@ -90,7 +90,7 @@ define([
         name: 'showText',
         value: true,
         typeSpec: 'baja:Boolean',
-        properties: { trueText: lex.get('showText'), falseText: lex.get('hideText') }
+        metadata: { trueText: lex.get('showText'), falseText: lex.get('hideText') }
       })
       .add({
         name: 'lineWidth',

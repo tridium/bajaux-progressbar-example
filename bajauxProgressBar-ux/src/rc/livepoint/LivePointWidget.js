@@ -82,6 +82,9 @@ define([
    * Called when rendering the Widget. This method is designed to be overridden.
    *
    * @param {Object} data - a point data model used to render the widget.
+   * This will be the data model constructed by
+   * {@link module:bajauxProgressBar/rc/livepoint/LivePointWidget#resolveData()}.
+   *
    * @returns {*|Promise} This method may optionally return a promise once the
    * Widget has been rendered.
    */
